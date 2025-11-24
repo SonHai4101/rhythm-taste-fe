@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { ThemeSwitcher } from "./ThemeSwitcher";
+// import { ThemeSwitcher } from "./ThemeSwitcher";
 
 const navItems = [
   { name: "Home", href: "/" },
@@ -37,7 +37,7 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-4">
-          <ThemeSwitcher />
+          {/* <ThemeSwitcher /> */}
           <a
             href="/resume.pdf"
             className="hidden md:block px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90"

@@ -1,12 +1,10 @@
 import { createBrowserRouter } from "react-router";
 import App from "../App";
-import { index } from "../pages";
-import { Project } from "../pages/Project";
-import { About } from "../pages/About";
-import { Blog } from "../pages/Blog";
-import { Contact } from "../pages/Contact";
 import { Login } from "../pages/Login";
 import { Register } from "../pages/Register";
+import { ProtectedRoute } from "../components/ProtectedRoute";
+import { index } from "../pages/ProtectdRoutes";
+import { Dashboard } from "../pages/ProtectdRoutes/Dashboard";
 
 export const routes = createBrowserRouter([
   {
@@ -22,24 +20,23 @@ export const routes = createBrowserRouter([
         Component: Register,
       },
       {
-        path: "",
-        Component: index,
-      },
-      {
-        path: "/projects",
-        Component: Project,
-      },
-      {
-        path: "/about",
-        Component: About,
-      },
-      {
-        path: "/blog",
-        Component: Blog,
-      },
-      {
-        path: "/contact",
-        Component: Contact,
+        Component: ProtectedRoute,
+        children: [
+          {
+            path: "/",
+            Component: index,
+            children: [
+              {
+                path: "",
+                Component: Dashboard,
+              },
+            ],
+          },
+          {
+            path: "/dashboard",
+            Component: Dashboard,
+          },
+        ],
       },
     ],
   },
