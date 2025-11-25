@@ -1,5 +1,7 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 // import { ThemeSwitcher } from "./ThemeSwitcher";
+import { LiaPowerOffSolid } from "react-icons/lia";
+import useAuthStore from "@/store/useAuthStore";
 
 const navItems = [
   { name: "Home", href: "/" },
@@ -11,6 +13,13 @@ const navItems = [
 
 export function Navbar() {
   const pathname = useLocation().pathname;
+  const { logOut } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logOut();
+    navigate("/login");
+  };
 
   return (
     <nav className="fixed top-0 w-full border-b z-50 bg-transparent backdrop-blur-2xl">
@@ -38,12 +47,12 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           {/* <ThemeSwitcher /> */}
-          <a
-            href="/resume.pdf"
+          <div
             className="hidden md:block px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90"
+            onClick={handleLogout}
           >
-            Resume
-          </a>
+            <LiaPowerOffSolid className="size-5" />
+          </div>
         </div>
       </div>
     </nav>
