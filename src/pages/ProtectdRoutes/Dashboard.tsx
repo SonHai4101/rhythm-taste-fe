@@ -28,19 +28,13 @@ import { useNavigate } from "react-router";
 
 export const Dashboard = () => {
   const [songs, setSongs] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
-  const [formData, setFormData] = useState<CreateSongInput>({
-    title: "",
-    artist: "",
-    album: "",
-    duration: 0,
-    audioUrl: "",
-  });
+ 
   const { logOut } = useAuthStore();
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -49,25 +43,13 @@ export const Dashboard = () => {
   };
 
   // Fetch all songs on mount
-  useEffect(() => {
-    fetchSongs();
-  }, []);
+ 
 
-  const fetchSongs = async () => {
-    try {
-      setLoading(true);
-      const data = await songService.getAllSongs();
-      setSongs(data);
-    } catch (error) {
-      console.error("Failed to fetch songs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
-      fetchSongs();
+      // fetchSongs();
       return;
     }
     try {
@@ -81,59 +63,39 @@ export const Dashboard = () => {
     }
   };
 
-  const handleCreateSong = async () => {
-    try {
-      await songService.createSong(formData);
-      setIsCreateDialogOpen(false);
-      resetForm();
-      fetchSongs();
-    } catch (error) {
-      console.error("Failed to create song:", error);
-    }
-  };
-
-  const handleUpdateSong = async () => {
-    if (!selectedSong) return;
-    try {
-      await songService.updateSong(selectedSong.id, formData);
-      setIsEditDialogOpen(false);
-      resetForm();
-      setSelectedSong(null);
-      fetchSongs();
-    } catch (error) {
-      console.error("Failed to update song:", error);
-    }
-  };
+  // const handleUpdateSong = async () => {
+  //   if (!selectedSong) return;
+  //   try {
+  //     await songService.updateSong(selectedSong.id, formData);
+  //     setIsEditDialogOpen(false);
+  //     resetForm();
+  //     setSelectedSong(null);
+  //     fetchSongs();
+  //   } catch (error) {
+  //     console.error("Failed to update song:", error);
+  //   }
+  // };
 
   const handleDeleteSong = async (id: string) => {
     if (!confirm("Are you sure you want to delete this song?")) return;
     try {
       await songService.deleteSong(id);
-      fetchSongs();
+      // fetchSongs();
     } catch (error) {
       console.error("Failed to delete song:", error);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      title: "",
-      artist: "",
-      album: "",
-      duration: 0,
-      audioUrl: "",
-    });
-  };
 
   const openEditDialog = (song: Song) => {
     setSelectedSong(song);
-    setFormData({
-      title: song.title,
-      artist: song.artist || "",
-      album: song.album || "",
-      duration: song.duration || 0,
-      audioUrl: song.audio?.url || "",
-    });
+    // setFormData({
+    //   title: song.title,
+    //   artist: song.artist || "",
+    //   album: song.album || "",
+    //   duration: song.duration || 0,
+    //   audioUrl: song.audio?.url || "",
+    // });
     setIsEditDialogOpen(true);
   };
 
@@ -149,13 +111,13 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-amber-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-pink-900/20">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-amber-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-pink-900/20">
       {/* Header */}
       <div className="border-b bg-white/50 dark:bg-gray-900/50 backdrop-blur-lg">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 My Music Library
               </h1>
               <p className="text-muted-foreground mt-1">
@@ -190,7 +152,7 @@ export const Dashboard = () => {
                 variant="outline"
                 onClick={() => {
                   setSearchQuery("");
-                  fetchSongs();
+                  // fetchSongs();
                 }}
               >
                 Clear
@@ -200,7 +162,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Upload Section */}
-        <Card className="mb-8 border-dashed border-2 bg-gradient-to-br from-white to-purple-50/30 dark:from-gray-800 dark:to-purple-900/10">
+        <Card className="mb-8 border-dashed border-2 bg-linear-to-br from-white to-purple-50/30 dark:from-gray-800 dark:to-purple-900/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Music className="h-5 w-5" />
@@ -241,7 +203,7 @@ export const Dashboard = () => {
             {songs.map((song) => (
               <Card
                 key={song.id}
-                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-purple-50/50 dark:from-gray-800 dark:to-purple-900/20 border-purple-200/50 dark:border-purple-700/50"
+                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-linear-to-br from-white to-purple-50/50 dark:from-gray-800 dark:to-purple-900/20 border-purple-200/50 dark:border-purple-700/50"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -332,10 +294,8 @@ export const Dashboard = () => {
               <Input
                 id="edit-title"
                 placeholder="Song title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                // value={formData.title}
+                onChange={() => {}}
               />
             </div>
             <div className="space-y-2">
@@ -343,10 +303,8 @@ export const Dashboard = () => {
               <Input
                 id="edit-artist"
                 placeholder="Artist name"
-                value={formData.artist}
-                onChange={(e) =>
-                  setFormData({ ...formData, artist: e.target.value })
-                }
+                // value={formData.artist}
+                onChange={() => {}}
               />
             </div>
             <div className="space-y-2">
@@ -354,10 +312,8 @@ export const Dashboard = () => {
               <Input
                 id="edit-album"
                 placeholder="Album name"
-                value={formData.album}
-                onChange={(e) =>
-                  setFormData({ ...formData, album: e.target.value })
-                }
+                // value={formData.album}
+                onChange={()=> {} }
               />
             </div>
             <div className="space-y-2">
@@ -366,13 +322,8 @@ export const Dashboard = () => {
                 id="edit-duration"
                 type="number"
                 placeholder="Duration in seconds"
-                value={formData.duration}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    duration: parseFloat(e.target.value) || 0,
-                  })
-                }
+                // value={formData.duration}
+                onChange={() => {}}
               />
             </div>
             <div className="space-y-2">
@@ -380,10 +331,8 @@ export const Dashboard = () => {
               <Input
                 id="edit-audioUrl"
                 placeholder="https://..."
-                value={formData.audioUrl}
-                onChange={(e) =>
-                  setFormData({ ...formData, audioUrl: e.target.value })
-                }
+                // value={formData.audioUrl}
+                onChange={() => {}}
               />
             </div>
           </div>
@@ -392,13 +341,13 @@ export const Dashboard = () => {
               variant="outline"
               onClick={() => {
                 setIsEditDialogOpen(false);
-                resetForm();
+                // resetForm();
                 setSelectedSong(null);
               }}
             >
               Cancel
             </Button>
-            <Button onClick={handleUpdateSong}>Update Song</Button>
+            <Button onClick={() => {}}>Update Song</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

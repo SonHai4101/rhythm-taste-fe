@@ -19,11 +19,10 @@ export interface Song {
 
 export interface CreateSongInput {
   title: string;
-  artist?: string;
-  album?: string;
-  duration?: number;
-  audioUrl?: string;
-  audioKey?: string;
+  artist?: string | null;
+  album?: string | null;
+  duration?: number | null;
+  audioId: string;
 }
 
 export interface UpdateSongInput {
@@ -35,9 +34,37 @@ export interface UpdateSongInput {
   audioKey?: string;
 }
 
+export interface GetAllSongsParams {
+  page?: number;
+  limit?: number;
+  artist?: string;
+  album?: string;
+}
+
+export interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface PaginatedSongsResponse {
+  songs: Song[];
+  pagination: PaginationInfo;
+}
+
 export const songService = {
-  getAllSongs: async (): Promise<Song[]> => {
-    const response = await axiosInstance.get<Song[]>("/song");
+  getAllSongs: async (
+    params?: GetAllSongsParams
+  ): Promise<PaginatedSongsResponse> => {
+    const response = await axiosInstance.get<PaginatedSongsResponse>("/song", {
+      params: {
+        page: params?.page,
+        limit: params?.limit,
+        artist: params?.artist,
+        album: params?.album,
+      },
+    });
     return response.data;
   },
 
