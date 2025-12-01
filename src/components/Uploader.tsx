@@ -2,8 +2,8 @@ import { useUploadFile } from "@better-upload/client";
 import { UploadButton } from "./upload-button";
 import useAuthStore from "../store/useAuthStore";
 import { parseBlob } from "music-metadata-browser";
-import { songService } from "../services/songService";
 import { audioService } from "../services/audioService";
+import { apiService } from "@/services/apiService";
 
 export function Uploader() {
   const { accessToken } = useAuthStore();
@@ -41,12 +41,22 @@ export function Uploader() {
           metadata.common.artist || metadata.common.albumartist || null;
         const album = metadata.common.album || null;
 
+        const albumCover = metadata.common.picture?.[0] || null
+        let coverBase64 = null
+        if (albumCover) {
+          const base64 = btoa(
+            new Uint8Array(albumCover.data).reduce((data, byte) => data + String.fromCharCode(byte), ""
+          ))
+          coverBase64 = `data: ${albumCover.format};base64,${base64}`
+        }
+
         // Create the song
-        await songService.createSong({
+        await apiService.song.createSong({
           title,
           duration,
           artist,
           album,
+          albumCover: coverBase64,
           audioId: audio.id,
         });
 

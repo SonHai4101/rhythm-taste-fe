@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Uploader } from "../../components/Uploader";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -20,21 +19,57 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { songService } from "@/services/songService";
-import type { Song, CreateSongInput } from "@/services/songService";
-import { Music, Trash2, Edit, Plus, Search, Play, Pause } from "lucide-react";
+import type { CreateSongInput } from "@/services/songService";
+import {
+  Music,
+  Trash2,
+  Edit,
+  Plus,
+  Search,
+  Play,
+  Pause,
+  Clock,
+  PlayIcon,
+  Dot,
+  Ellipsis,
+} from "lucide-react";
 import { LiaPowerOffSolid } from "react-icons/lia";
 import useAuthStore from "@/store/useAuthStore";
 import { useNavigate } from "react-router";
+import { useGetAllSongs } from "@/hook/useSong";
+import { Avatar, Box, Card, Flex, Table, Text } from "@radix-ui/themes";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { formatDuration } from "@/helper/formatDuration";
+import { usePlayerStore } from "@/store/usePlayerStore";
+import type { Song } from "@/constants/types";
+dayjs.extend(relativeTime);
 
 export const Dashboard = () => {
-  const [songs, setSongs] = useState<Song[]>([]);
+  // const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
-  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
- 
+  const { data: allSongs, isLoading: songsLoading } = useGetAllSongs();
+
+  // const togglePlay = (song: Song) => {
+  //   const { currentSong, isPlaying, setSong, setPlaying, audioElement } =
+  //     usePlayerStore.getState();
+
+  //   if (!audioElement) return;
+
+  //   // If clicking the same song → toggle play/pause
+  //   if (currentSong?.id === song.id) {
+  //     setPlaying(!isPlaying);
+  //     return;
+  //   }
+
+  //   // If clicking a new song → load & play it
+  //   setSong(song); // sets current song
+  //   setPlaying(true);
+  // };
+
   const { logOut } = useAuthStore();
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -43,36 +78,20 @@ export const Dashboard = () => {
   };
 
   // Fetch all songs on mount
- 
 
- 
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      // fetchSongs();
-      return;
-    }
-    try {
-      setLoading(true);
-      const data = await songService.searchSongs(searchQuery);
-      setSongs(data);
-    } catch (error) {
-      console.error("Failed to search songs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // const handleUpdateSong = async () => {
-  //   if (!selectedSong) return;
+  // const handleSearch = async () => {
+  //   if (!searchQuery.trim()) {
+  //     // fetchSongs();
+  //     return;
+  //   }
   //   try {
-  //     await songService.updateSong(selectedSong.id, formData);
-  //     setIsEditDialogOpen(false);
-  //     resetForm();
-  //     setSelectedSong(null);
-  //     fetchSongs();
+  //     setLoading(true);
+  //     const data = await songService.searchSongs(searchQuery);
+  //     setSongs(data);
   //   } catch (error) {
-  //     console.error("Failed to update song:", error);
+  //     console.error("Failed to search songs:", error);
+  //   } finally {
+  //     setLoading(false);
   //   }
   // };
 
@@ -86,29 +105,17 @@ export const Dashboard = () => {
     }
   };
 
-
-  const openEditDialog = (song: Song) => {
-    setSelectedSong(song);
-    // setFormData({
-    //   title: song.title,
-    //   artist: song.artist || "",
-    //   album: song.album || "",
-    //   duration: song.duration || 0,
-    //   audioUrl: song.audio?.url || "",
-    // });
-    setIsEditDialogOpen(true);
-  };
-
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds) return "N/A";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const togglePlay = (songId: string) => {
-    setCurrentlyPlaying(currentlyPlaying === songId ? null : songId);
-  };
+  // const openEditDialog = (song: Song) => {
+  //   setSelectedSong(song);
+  //   // setFormData({
+  //   //   title: song.title,
+  //   //   artist: song.artist || "",
+  //   //   album: song.album || "",
+  //   //   duration: song.duration || 0,
+  //   //   audioUrl: song.audio?.url || "",
+  //   // });
+  //   setIsEditDialogOpen(true);
+  // };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-amber-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-pink-900/20">
@@ -142,11 +149,15 @@ export const Dashboard = () => {
                 placeholder="Search songs by title, artist, or album..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="pl-10"
               />
             </div>
-            <Button onClick={handleSearch}>Search</Button>
+            <Button
+            // onClick={handleSearch}
+            >
+              Search
+            </Button>
             {searchQuery && (
               <Button
                 variant="outline"
@@ -177,12 +188,7 @@ export const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Songs Grid */}
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-          </div>
-        ) : songs.length === 0 ? (
+        {allSongs && allSongs.data.length === 0 && (
           <div className="text-center py-20">
             <Music className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-xl font-semibold mb-2">No songs found</h3>
@@ -198,85 +204,56 @@ export const Dashboard = () => {
               </Button>
             )}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {songs.map((song) => (
-              <Card
-                key={song.id}
-                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-linear-to-br from-white to-purple-50/50 dark:from-gray-800 dark:to-purple-900/20 border-purple-200/50 dark:border-purple-700/50"
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="truncate text-lg">
-                        {song.title}
-                      </CardTitle>
-                      <CardDescription className="truncate">
-                        {song.artist || "Unknown Artist"}
-                      </CardDescription>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => togglePlay(song.id)}
-                      className="shrink-0"
-                    >
-                      {currentlyPlaying === song.id ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 mb-4">
-                    {song.album && (
-                      <p className="text-sm text-muted-foreground truncate">
-                        <span className="font-medium">Album:</span> {song.album}
-                      </p>
-                    )}
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-medium">Duration:</span>{" "}
-                      {formatDuration(song.duration)}
-                    </p>
-                    {song.audio?.url && (
-                      <div className="mt-3">
-                        <audio
-                          src={song.audio.url}
-                          controls
-                          className="w-full h-8"
-                          onPlay={() => setCurrentlyPlaying(song.id)}
-                          onPause={() => setCurrentlyPlaying(null)}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => openEditDialog(song)}
-                    >
-                      <Edit className="h-3 w-3 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleDeleteSong(song.id)}
-                    >
-                      <Trash2 className="h-3 w-3 mr-1" />
-                      Delete
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         )}
+        <Table.Root>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeaderCell>#</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Album</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Date added</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>
+                <Clock />
+              </Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
+            </Table.Row>
+          </Table.Header>
+          {allSongs?.data.map((song, index) => (
+            <Table.Body className="hover:bg-white/70" key={song.id}>
+              <Table.Row className="group" align="center">
+                <Table.RowHeaderCell
+                  className="min-w-11"
+                  onClick={() => {
+                    usePlayerStore.getState().setQueue(allSongs.data, index);
+                  }}
+                >
+                  <PlayIcon className="size-5 hidden group-hover:inline-block cursor-pointer" />
+                  <span className="group-hover:hidden">{index + 1}</span>
+                </Table.RowHeaderCell>
+
+                <Table.Cell>
+                  <Flex gap="2" align="center">
+                    <img
+                      className="size-8"
+                      src={song.albumCover || "/default-cover-image.png"}
+                      alt="album cover"
+                    />
+                    <Flex direction="column">
+                      <p>{song.title}</p>
+                      <p>{song.artist}</p>
+                    </Flex>
+                  </Flex>
+                </Table.Cell>
+                <Table.Cell>{song.album}</Table.Cell>
+                <Table.Cell>{dayjs(song.createdAt).fromNow()}</Table.Cell>
+                <Table.Cell>{formatDuration(song.duration)}</Table.Cell>
+                <Table.Cell>
+                  <Ellipsis className="size-4 cursor-pointer" />
+                </Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          ))}
+        </Table.Root>
       </div>
 
       {/* Edit Dialog */}
@@ -313,7 +290,7 @@ export const Dashboard = () => {
                 id="edit-album"
                 placeholder="Album name"
                 // value={formData.album}
-                onChange={()=> {} }
+                onChange={() => {}}
               />
             </div>
             <div className="space-y-2">

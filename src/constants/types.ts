@@ -5,22 +5,30 @@ export interface User {
   name: string;
 }
 
+export interface Pagination {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface Song {
-  id: string
-  title: string
-  artist: any
-  album: any
-  duration: number
-  audioId: string
-  createdAt: string
-  updatedAt: string
-  audio: Audio
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  albumCover: string;
+  duration: number;
+  audioId: string;
+  createdAt: string;
+  updatedAt: string;
+  audio: Audio;
 }
 
 export interface Audio {
-  id: string
-  url: string
-  key: string
-  createdAt: string
-  updatedAt: string
+  id: string;
+  url: string;
+  key: string;
+  createdAt: string;
+  updatedAt: string;
 }

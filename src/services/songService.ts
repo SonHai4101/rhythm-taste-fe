@@ -5,6 +5,7 @@ export interface Song {
   title: string;
   artist: string | null;
   album: string | null;
+  albumCover: string| null
   duration: number | null;
   createdAt: string;
   updatedAt: string;
@@ -21,6 +22,7 @@ export interface CreateSongInput {
   title: string;
   artist?: string | null;
   album?: string | null;
+  albumCover?: string | null;
   duration?: number | null;
   audioId: string;
 }

@@ -1,12 +1,54 @@
 import { Outlet } from "react-router";
-import { Navbar } from "./components/NavBar";
 import { ToastContainer } from "react-toastify";
+import { Theme } from "@radix-ui/themes";
+import { useEffect, useRef } from "react";
+import { usePlayerStore } from "./store/usePlayerStore";
 
 function App() {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const setAudioElement = usePlayerStore((s) => s.setAudioElement);
+  const currentSong = usePlayerStore((s) => s.currentSong);
+  const isPlaying = usePlayerStore((s) => s.isPlaying);
+  const setCurrentTime = usePlayerStore((s) => s.setCurrentTime);
+  const setDuration = usePlayerStore((s) => s.setDuration);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    setAudioElement(audio);
+
+    audio.onended = () => {
+      usePlayerStore.getState().next();
+    };
+    audio.onloadedmetadata = () => {
+      setDuration(audio.duration);
+    };
+    audio.ontimeupdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current && currentSong) {
+      audioRef.current.src = currentSong.audio.url;
+      audioRef.current.play();
+    }
+  }, [currentSong]);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (isPlaying) audioRef.current.play();
+    else audioRef.current.pause();
+  }, [isPlaying]);
+
   return (
     <div>
-      <Outlet />
-      <ToastContainer position="top-right" autoClose={3000} />
+      <Theme>
+        <Outlet />
+        <ToastContainer position="top-right" autoClose={3000} />
+        <audio ref={audioRef} />
+      </Theme>
     </div>
   );
 }

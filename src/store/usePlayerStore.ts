@@ -1,0 +1,117 @@
+import type { Song } from "@/constants/types";
+import { shuffleArray } from "@/util/shuffle";
+import { create } from "zustand";
+
+interface PlayerStore {
+  queue: Song[];
+  originalQueue: Song[];
+  queueIndex: number;
+
+  currentTime: number;
+  duration: number;
+
+  currentSong: Song | null;
+  isPlaying: boolean;
+  isShuffling: boolean;
+  audioElement: HTMLAudioElement | null;
+
+  setAudioElement: (el: HTMLAudioElement) => void;
+  setSong: (song: Song) => void;
+  setPlaying: (is: boolean) => void;
+  togglePlay: () => void;
+  toggleShuffel: () => void;
+  setCurrentTime: (time: number) => void;
+  setDuration: (time: number) => void;
+  setQueue: (song: Song[], startIndex: number) => void;
+  next: () => void;
+  previous: () => void;
+}
+
+export const usePlayerStore = create<PlayerStore>((set, get) => ({
+  queue: [],
+  originalQueue: [],
+  queueIndex: 0,
+  currentTime: 0,
+  duration: 0,
+  currentSong: null,
+  isPlaying: false,
+  isShuffling: false,
+  audioElement: null,
+  setAudioElement: (el) => set({ audioElement: el }),
+  setSong: (song) =>
+    set({
+      currentSong: song,
+      isPlaying: true,
+      currentTime: 0,
+    }),
+  setPlaying: (is) => set({ isPlaying: is }),
+  togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
+  toggleShuffel: () =>
+    set((state) => {
+      const isShuffling = !state.isShuffling;
+
+      if (isShuffling) {
+        const shuffled = [...state.queue];
+        shuffleArray(shuffled);
+
+        const current = state.currentSong;
+
+        if (current) {
+          const index = shuffled.findIndex((s) => s.id === current.id);
+
+          if (index !== -1) {
+            shuffled.splice(index, 1);
+            shuffled.unshift(current);
+          }
+        }
+        return {
+          isShuffling: true,
+          queue: shuffled,
+          queueIndex: 0,
+        };
+      }
+      const original = state.originalQueue;
+      const index = original.findIndex((s) => s.id === state.currentSong?.id);
+      return {
+        isShuffling: false,
+        queue: original,
+        queueIndex: index === -1 ? 0 : index,
+      };
+    }),
+  setCurrentTime: (time) => set({ currentTime: time }),
+  setDuration: (time) => set({ duration: time }),
+  setQueue: (songs, startIndex) =>
+    set({
+      queue: songs,
+      originalQueue: songs,
+      queueIndex: startIndex,
+      currentSong: songs[startIndex],
+      isPlaying: true,
+      currentTime: 0,
+    }),
+  next: () => {
+    const { queue, queueIndex } = get();
+    const nextIndex = queueIndex + 1;
+
+    if (nextIndex >= queue.length) return;
+
+    set({
+      queueIndex: nextIndex,
+      currentSong: queue[nextIndex],
+      isPlaying: true,
+      currentTime: 0,
+    });
+  },
+  previous: () => {
+    const { queue, queueIndex } = get();
+    const prevIndex = queueIndex - 1;
+    if (prevIndex < 0) return;
+
+    set({
+      queueIndex: prevIndex,
+      currentSong: queue[prevIndex],
+      isPlaying: true,
+      currentTime: 0,
+    });
+  },
+}));
