@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
 import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAuthStore from "../store/useAuthStore";

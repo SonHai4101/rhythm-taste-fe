@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Uploader } from "../../components/Uploader";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,42 +14,24 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { songService } from "@/services/songService";
-import type { CreateSongInput } from "@/services/songService";
-import {
-  Music,
-  Trash2,
-  Edit,
-  Plus,
-  Search,
-  Play,
-  Pause,
-  Clock,
-  PlayIcon,
-  Dot,
-  Ellipsis,
-} from "lucide-react";
+import { Music, Plus, Search, Clock, PlayIcon, Ellipsis } from "lucide-react";
 import { LiaPowerOffSolid } from "react-icons/lia";
 import useAuthStore from "@/store/useAuthStore";
 import { useNavigate } from "react-router";
 import { useGetAllSongs } from "@/hook/useSong";
-import { Avatar, Box, Card, Flex, Table, Text } from "@radix-ui/themes";
+import { Card, Flex, Table } from "@radix-ui/themes";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { formatDuration } from "@/helper/formatDuration";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import type { Song } from "@/constants/types";
 dayjs.extend(relativeTime);
 
 export const Dashboard = () => {
   // const [songs, setSongs] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { data: allSongs, isLoading: songsLoading } = useGetAllSongs();
 
@@ -95,15 +77,15 @@ export const Dashboard = () => {
   //   }
   // };
 
-  const handleDeleteSong = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this song?")) return;
-    try {
-      await songService.deleteSong(id);
-      // fetchSongs();
-    } catch (error) {
-      console.error("Failed to delete song:", error);
-    }
-  };
+  // const handleDeleteSong = async (id: string) => {
+  //   if (!confirm("Are you sure you want to delete this song?")) return;
+  //   try {
+  //     await songService.deleteSong(id);
+  //     // fetchSongs();
+  //   } catch (error) {
+  //     console.error("Failed to delete song:", error);
+  //   }
+  // };
 
   // const openEditDialog = (song: Song) => {
   //   setSelectedSong(song);
@@ -198,7 +180,7 @@ export const Dashboard = () => {
                 : "Get started by adding your first song"}
             </p>
             {!searchQuery && (
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Your First Song
               </Button>
@@ -218,41 +200,47 @@ export const Dashboard = () => {
               <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
-          {allSongs?.data.map((song, index) => (
-            <Table.Body className="hover:bg-white/70" key={song.id}>
-              <Table.Row className="group" align="center">
-                <Table.RowHeaderCell
-                  className="min-w-11"
-                  onClick={() => {
-                    usePlayerStore.getState().setQueue(allSongs.data, index);
-                  }}
-                >
-                  <PlayIcon className="size-5 hidden group-hover:inline-block cursor-pointer" />
-                  <span className="group-hover:hidden">{index + 1}</span>
-                </Table.RowHeaderCell>
+          {songsLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+            </div>
+          ) : (
+            allSongs?.data.map((song, index) => (
+              <Table.Body className="hover:bg-white/70" key={song.id}>
+                <Table.Row className="group" align="center">
+                  <Table.RowHeaderCell
+                    className="min-w-11"
+                    onClick={() => {
+                      usePlayerStore.getState().setQueue(allSongs.data, index);
+                    }}
+                  >
+                    <PlayIcon className="size-5 hidden group-hover:inline-block cursor-pointer" />
+                    <span className="group-hover:hidden">{index + 1}</span>
+                  </Table.RowHeaderCell>
 
-                <Table.Cell>
-                  <Flex gap="2" align="center">
-                    <img
-                      className="size-8"
-                      src={song.albumCover || "/default-cover-image.png"}
-                      alt="album cover"
-                    />
-                    <Flex direction="column">
-                      <p>{song.title}</p>
-                      <p>{song.artist}</p>
+                  <Table.Cell>
+                    <Flex gap="2" align="center">
+                      <img
+                        className="size-8"
+                        src={song.albumCover || "/default-cover-image.png"}
+                        alt="album cover"
+                      />
+                      <Flex direction="column">
+                        <p>{song.title}</p>
+                        <p>{song.artist}</p>
+                      </Flex>
                     </Flex>
-                  </Flex>
-                </Table.Cell>
-                <Table.Cell>{song.album}</Table.Cell>
-                <Table.Cell>{dayjs(song.createdAt).fromNow()}</Table.Cell>
-                <Table.Cell>{formatDuration(song.duration)}</Table.Cell>
-                <Table.Cell>
-                  <Ellipsis className="size-4 cursor-pointer" />
-                </Table.Cell>
-              </Table.Row>
-            </Table.Body>
-          ))}
+                  </Table.Cell>
+                  <Table.Cell>{song.album}</Table.Cell>
+                  <Table.Cell>{dayjs(song.createdAt).fromNow()}</Table.Cell>
+                  <Table.Cell>{formatDuration(song.duration)}</Table.Cell>
+                  <Table.Cell>
+                    <Ellipsis className="size-4 cursor-pointer" />
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            ))
+          )}
         </Table.Root>
       </div>
 
@@ -319,7 +307,7 @@ export const Dashboard = () => {
               onClick={() => {
                 setIsEditDialogOpen(false);
                 // resetForm();
-                setSelectedSong(null);
+                // setSelectedSong(null);
               }}
             >
               Cancel
