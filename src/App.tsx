@@ -13,6 +13,17 @@ function App() {
   const setDuration = usePlayerStore((s) => s.setDuration);
 
   useEffect(() => {
+    const store = usePlayerStore.getState();
+    store.loadStateFromLocalStorage();
+
+    if (store.currentSong && store.audioElement) {
+      store.audioElement.src = store.currentSong.audio.url;
+
+      store.audioElement.currentTime = store.currentTime || 0;
+    }
+  }, []);
+
+  useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 

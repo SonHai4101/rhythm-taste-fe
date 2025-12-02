@@ -1,5 +1,6 @@
 import type { Song } from "@/constants/types";
 import { shuffleArray } from "@/util/shuffle";
+import type { subscribe } from "diagnostics_channel";
 import { create } from "zustand";
 
 interface PlayerStore {
@@ -28,6 +29,9 @@ interface PlayerStore {
   setQueue: (song: Song[], startIndex: number) => void;
   next: () => void;
   previous: () => void;
+
+  saveStateToLocalStorage: () => void;
+  loadStateFromLocalStorage: () => void;
 }
 
 export const usePlayerStore = create<PlayerStore>((set, get) => ({
@@ -150,4 +154,40 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       currentTime: 0,
     });
   },
+  saveStateToLocalStorage: () => {
+    const state = get();
+
+    const data = {
+      currentSong: state.currentSong,
+      queue: state.queue,
+      queueIndex: state.queueIndex,
+      currentTime: state.currentTime,
+      repeatMode: state.repeatMode,
+      isShuffling: state.isShuffling,
+    };
+    localStorage.setItem("playerState", JSON.stringify(data));
+  },
+  loadStateFromLocalStorage: () => {
+    try {
+      const raw = localStorage.getItem("playerState");
+      if (!raw) return;
+      const data = JSON.parse(raw);
+
+      set({
+        currentSong: data.currentSong,
+        queue: data.queue,
+        queueIndex: data.queueIndex,
+        currentTime: data.currentTime,
+        repeatMode: data.repeatMode,
+        isShuffling: data.isShuffling,
+      });
+    } catch (err) {
+      console.error("Failed to load player state: ", err);
+    }
+  },
 }));
+
+usePlayerStore.subscribe((state) => {
+  // Save to localStorage whenever relevant state changes
+  state.saveStateToLocalStorage();
+});
