@@ -32,7 +32,7 @@ export const PlaybackBar = () => {
     <div className="fixed bottom-0 w-full flex items-center justify-between gap-4 bg-card border border-border rounded-xl px-6 py-4 shadow-lg">
       {/* Track Info */}
       <div className="flex items-center gap-4 min-w-0 w-1/4">
-        <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="w-14 h-14 rounded-lg bg-muted items-center justify-center shrink-0 overflow-hidden hidden md:flex">
           <img
             src="/album-cover-art-music.jpg"
             alt="Album cover"
@@ -138,17 +138,17 @@ export const PlaybackBar = () => {
       </div>
 
       {/* Volume & Extra Controls */}
-      <div className="flex items-center gap-2 w-1/4 justify-end">
-        <Button
+      <div className="flex items-center w-1/5 justify-end">
+        {/* <Button
           variant="ghost"
           size="icon"
           className="h-9 w-9 text-muted-foreground hover:text-foreground"
         >
           <List className="h-4 w-4" />
           <span className="sr-only">Queue</span>
-        </Button>
+        </Button> */}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center ">
           <Button
             variant="ghost"
             size="icon"
@@ -173,14 +173,14 @@ export const PlaybackBar = () => {
           />
         </div>
 
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           className="h-9 w-9 text-muted-foreground hover:text-foreground"
         >
           <Maximize2 className="h-4 w-4" />
           <span className="sr-only">Fullscreen</span>
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
