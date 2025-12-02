@@ -170,7 +170,7 @@ export const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {allSongs && allSongs.data.length === 0 && (
+        {allSongs && allSongs.data.length === 0 ? (
           <div className="text-center py-20">
             <Music className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-xl font-semibold mb-2">No songs found</h3>
@@ -186,62 +186,71 @@ export const Dashboard = () => {
               </Button>
             )}
           </div>
-        )}
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>#</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Album</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Date added</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>
-                <Clock />
-              </Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
-          {songsLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-            </div>
-          ) : (
-            allSongs?.data.map((song, index) => (
-              <Table.Body className="hover:bg-white/70" key={song.id}>
-                <Table.Row className="group" align="center">
-                  <Table.RowHeaderCell
-                    className="min-w-11"
-                    onClick={() => {
-                      usePlayerStore.getState().setQueue(allSongs.data, index);
-                    }}
-                  >
-                    <PlayIcon className="size-5 hidden group-hover:inline-block cursor-pointer" />
-                    <span className="group-hover:hidden">{index + 1}</span>
+        ) : (
+          <Table.Root>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeaderCell>#</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Title</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Album</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Date added</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  <Clock />
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
+              </Table.Row>
+            </Table.Header>
+            {songsLoading ? (
+              <Table.Body>
+                <Table.Row>
+                  <Table.RowHeaderCell colSpan={5}>
+                    <div className="flex items-center justify-center py-20">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                    </div>
                   </Table.RowHeaderCell>
-
-                  <Table.Cell>
-                    <Flex gap="2" align="center">
-                      <img
-                        className="size-8"
-                        src={song.albumCover || "/default-cover-image.png"}
-                        alt="album cover"
-                      />
-                      <Flex direction="column">
-                        <p>{song.title}</p>
-                        <p>{song.artist}</p>
-                      </Flex>
-                    </Flex>
-                  </Table.Cell>
-                  <Table.Cell>{song.album}</Table.Cell>
-                  <Table.Cell>{dayjs(song.createdAt).fromNow()}</Table.Cell>
-                  <Table.Cell>{formatDuration(song.duration)}</Table.Cell>
-                  <Table.Cell>
-                    <Ellipsis className="size-4 cursor-pointer" />
-                  </Table.Cell>
                 </Table.Row>
               </Table.Body>
-            ))
-          )}
-        </Table.Root>
+            ) : (
+              allSongs?.data.map((song, index) => (
+                <Table.Body className="hover:bg-white/70" key={song.id}>
+                  <Table.Row className="group" align="center">
+                    <Table.RowHeaderCell
+                      className="min-w-11"
+                      onClick={() => {
+                        usePlayerStore
+                          .getState()
+                          .setQueue(allSongs.data, index);
+                      }}
+                    >
+                      <PlayIcon className="size-5 hidden group-hover:inline-block cursor-pointer" />
+                      <span className="group-hover:hidden">{index + 1}</span>
+                    </Table.RowHeaderCell>
+
+                    <Table.Cell>
+                      <Flex gap="2" align="center">
+                        <img
+                          className="size-8"
+                          src={song.albumCover || "/default-cover-image.png"}
+                          alt="album cover"
+                        />
+                        <Flex direction="column">
+                          <p>{song.title}</p>
+                          <p>{song.artist}</p>
+                        </Flex>
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell>{song.album}</Table.Cell>
+                    <Table.Cell>{dayjs(song.createdAt).fromNow()}</Table.Cell>
+                    <Table.Cell>{formatDuration(song.duration)}</Table.Cell>
+                    <Table.Cell>
+                      <Ellipsis className="size-4 cursor-pointer" />
+                    </Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              ))
+            )}
+          </Table.Root>
+        )}
       </div>
 
       {/* Edit Dialog */}
