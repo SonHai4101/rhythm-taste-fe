@@ -66,5 +66,5 @@ export function Uploader() {
       }
     },
   });
-  return <UploadButton control={control} accept="audio/*" />;
+  return <UploadButton control={control} accept="audio/mp3" />;
 }
