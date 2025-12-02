@@ -1,7 +1,5 @@
 import { Button } from "./ui/button";
 import {
-  List,
-  Maximize2,
   Pause,
   Play,
   Repeat,
