@@ -1,4 +1,5 @@
 export const keys = {
   songs: "songs",
-  song: "song"
+  song: "song",
+  audios: "audios"
 }

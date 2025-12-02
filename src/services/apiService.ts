@@ -1,4 +1,4 @@
-import type { Pagination, Song } from "@/constants/types";
+import type { Audio, Pagination, Song } from "@/constants/types";
 import { axiosInstance } from "@/lib/axios";
 
 export const apiService = {
@@ -17,5 +17,11 @@ export const apiService = {
       duration?: number | null;
       audioId: string;
     }) => axiosInstance.post("/song", body),
+    deleteSongById: (id: string) => axiosInstance.delete(`/song/${id}`),
+  },
+  audio: {
+    getAudioByKey: (key: string): Promise<Audio> =>
+      axiosInstance.get(`/audio/key/${key}`).then((res) => res.data),
+    deleteAudio: (id: string) => axiosInstance.delete(`/audio/delete/${id}`),
   },
 };

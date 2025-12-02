@@ -21,12 +21,14 @@ import { Music, Plus, Search, Clock, PlayIcon, Ellipsis } from "lucide-react";
 import { LiaPowerOffSolid } from "react-icons/lia";
 import useAuthStore from "@/store/useAuthStore";
 import { useNavigate } from "react-router";
-import { useGetAllSongs } from "@/hook/useSong";
-import { Card, Flex, Table } from "@radix-ui/themes";
+import { useDeleteSongById, useGetAllSongs } from "@/hook/useSong";
+import { Card, DropdownMenu, Flex, Table } from "@radix-ui/themes";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { formatDuration } from "@/helper/formatDuration";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { toast } from "react-toastify";
+import { useDeleteAudio } from "@/hook/useAudio";
 dayjs.extend(relativeTime);
 
 export const Dashboard = () => {
@@ -34,6 +36,8 @@ export const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { data: allSongs, isLoading: songsLoading } = useGetAllSongs();
+  const { mutate: deleteSong } = useDeleteSongById();
+  const { mutate: deleteAudio } = useDeleteAudio();
 
   // const togglePlay = (song: Song) => {
   //   const { currentSong, isPlaying, setSong, setPlaying, audioElement } =
@@ -86,6 +90,18 @@ export const Dashboard = () => {
   //     console.error("Failed to delete song:", error);
   //   }
   // };
+
+  const handleDelete = (songId: string, audioId: string) => {
+    deleteSong(songId, {
+      onSuccess: () => {
+        toast.success("Delete successfully");
+        deleteAudio(audioId)
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    });
+  };
 
   // const openEditDialog = (song: Song) => {
   //   setSelectedSong(song);
@@ -243,7 +259,21 @@ export const Dashboard = () => {
                     <Table.Cell>{dayjs(song.createdAt).fromNow()}</Table.Cell>
                     <Table.Cell>{formatDuration(song.duration)}</Table.Cell>
                     <Table.Cell>
-                      <Ellipsis className="size-4 cursor-pointer" />
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger>
+                          <Button variant="ghost" className="cursor-pointer">
+                            <Ellipsis className="size-4" />
+                          </Button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Content>
+                          <DropdownMenu.Item
+                            color="red"
+                            onClick={() => handleDelete(song.id, song.audioId)}
+                          >
+                            Delete
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu.Root>
                     </Table.Cell>
                   </Table.Row>
                 </Table.Body>

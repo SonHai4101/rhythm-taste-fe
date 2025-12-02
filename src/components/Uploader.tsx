@@ -2,7 +2,6 @@ import { useUploadFile } from "@better-upload/client";
 import { UploadButton } from "./upload-button";
 import useAuthStore from "../store/useAuthStore";
 import { parseBlob } from "music-metadata-browser";
-import { audioService } from "../services/audioService";
 import { apiService } from "@/services/apiService";
 
 export function Uploader() {
@@ -24,7 +23,7 @@ export function Uploader() {
         }
 
         // Fetch the audio record from the backend using the key
-        const audio = await audioService.getAudioByKey(key);
+        const audio = await apiService.audio.getAudioByKey(key);
 
         // Parse metadata from the audio file
         const metadata = await parseBlob(file.raw);
