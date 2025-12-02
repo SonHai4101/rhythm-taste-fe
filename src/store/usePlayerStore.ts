@@ -15,6 +15,9 @@ interface PlayerStore {
   isShuffling: boolean;
   audioElement: HTMLAudioElement | null;
 
+  repeatMode: "off" | "all" | "one";
+  toggleRepeat: () => void;
+
   setAudioElement: (el: HTMLAudioElement) => void;
   setSong: (song: Song) => void;
   setPlaying: (is: boolean) => void;
@@ -37,6 +40,18 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   isPlaying: false,
   isShuffling: false,
   audioElement: null,
+  repeatMode: "off",
+  toggleRepeat: () =>
+    set((state) => {
+      const nextMode =
+        state.repeatMode === "off"
+          ? "all"
+          : state.repeatMode === "all"
+          ? "one"
+          : "off";
+
+      return { repeatMode: nextMode };
+    }),
   setAudioElement: (el) => set({ audioElement: el }),
   setSong: (song) =>
     set({
@@ -90,10 +105,31 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       currentTime: 0,
     }),
   next: () => {
-    const { queue, queueIndex } = get();
+    const { queue, queueIndex, repeatMode } = get();
+    if (repeatMode === "one") {
+      // simply restart the same song
+      const audio = get().audioElement;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play();
+      }
+      set({ currentTime: 0, isPlaying: true });
+      return;
+    }
     const nextIndex = queueIndex + 1;
 
-    if (nextIndex >= queue.length) return;
+    if (nextIndex >= queue.length) {
+      if (repeatMode === "all") {
+        // loop back to start
+        set({
+          queueIndex: 0,
+          currentSong: queue[0],
+          isPlaying: true,
+          currentTime: 0,
+        });
+      }
+      return;
+    }
 
     set({
       queueIndex: nextIndex,

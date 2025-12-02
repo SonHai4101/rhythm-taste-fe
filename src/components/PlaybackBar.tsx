@@ -27,6 +27,8 @@ export const PlaybackBar = () => {
   const next = usePlayerStore((s) => s.next);
   const isShuffling = usePlayerStore((s) => s.isShuffling);
   const toggleShuffle = usePlayerStore((s) => s.toggleShuffel);
+  const repeatMode = usePlayerStore((s) => s.repeatMode);
+  const toggleRepeat = usePlayerStore((s) => s.toggleRepeat);
 
   return (
     <div className="fixed bottom-0 w-full flex items-center justify-between gap-4 bg-card border border-border rounded-xl px-6 py-4 shadow-lg">
@@ -55,7 +57,7 @@ export const PlaybackBar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className={`h-9 w-9 hover:text-foreground ${
+            className={`h-9 w-9 ${isShuffling ? "hover:text-red-500" : "hover:text-foreground"} ${
               isShuffling ? "text-red-500" : "text-muted-foreground"
             }`}
             onClick={toggleShuffle}
@@ -104,15 +106,15 @@ export const PlaybackBar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className={cn(
-              "h-9 w-9 text-muted-foreground hover:text-foreground relative"
-            )}
-            onClick={() => {}}
+            className={
+              `h-9 w-9 text-muted-foreground ${repeatMode !== "off" ? "hover:text-yellow-500" : "hover:text-muted-foreground"} relative ${repeatMode !== "off" ? "text-yellow-500" : "text-muted-foreground"}`
+            }
+            onClick={toggleRepeat}
           >
             <Repeat className="h-4 w-4" />
-            {/* {repeatMode === "one" && (
-              <span className="absolute -top-0.5 -right-0.5 text-[10px] font-bold text-primary">1</span>
-            )} */}
+            {repeatMode === "one" && (
+              <span className="absolute top-0.5 right-0.5 text-[10px] font-bold text-primary">1</span>
+            )}
             <span className="sr-only">Repeat</span>
           </Button>
         </div>

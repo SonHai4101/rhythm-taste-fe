@@ -4,15 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 /* @custom-variant dark (&:where(.dark, .dark *)); */
 
-/* input:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px #8babe8;
-}
-
-textarea:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px #8babe8;
-}
 
 @theme {
     --color-text: #000000;
@@ -34,7 +25,7 @@ textarea:focus {
     --color-text-placehoder: #e6e6e6;
 }
 
-@layer base {
+/* @layer base {
     p {
         color: var(--color-text);
     }
@@ -72,7 +63,7 @@ textarea:focus {
 
   --color-muted: var(--muted);
 
-  --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground: var(--muted-foreground);mute
 
   --color-accent: var(--accent);
 
