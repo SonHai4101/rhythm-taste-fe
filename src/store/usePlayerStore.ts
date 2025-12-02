@@ -1,6 +1,5 @@
 import type { Song } from "@/constants/types";
 import { shuffleArray } from "@/util/shuffle";
-import type { subscribe } from "diagnostics_channel";
 import { create } from "zustand";
 
 interface PlayerStore {
