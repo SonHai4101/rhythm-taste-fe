@@ -27,7 +27,7 @@ export const PlaybackBar = () => {
   const toggleRepeat = usePlayerStore((s) => s.toggleRepeat);
 
   return (
-    <div className="fixed bottom-0 w-full flex items-center justify-between gap-4 bg-card border border-border rounded-xl px-6 py-4 shadow-lg">
+    <div className="fixed bottom-0 w-full flex items-center justify-between gap-4 bg-white border border-border rounded-xl px-6 py-4 shadow-lg">
       {/* Track Info */}
       <div className="flex items-center gap-4 min-w-0 w-1/4">
         <div className="w-14 h-14 rounded-lg bg-muted items-center justify-center shrink-0 overflow-hidden hidden md:flex">
