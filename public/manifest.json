@@ -1,0 +1,10 @@
+{
+  "name": "Rhythm Taste - Store Your Own World",
+  "short_name": "Rhythm Taste",
+  "description": "Store Your Own World",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait"
+}

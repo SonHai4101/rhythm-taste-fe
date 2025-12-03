@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Uploader } from "../../components/Uploader";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Music, Plus, Search, Clock, PlayIcon, Ellipsis } from "lucide-react";
+import { Music, Search, Clock, PlayIcon, Ellipsis } from "lucide-react";
 import { LiaPowerOffSolid } from "react-icons/lia";
 import useAuthStore from "@/store/useAuthStore";
 import { useNavigate } from "react-router";
@@ -196,10 +196,7 @@ export const Dashboard = () => {
                 : "Get started by adding your first song"}
             </p>
             {!searchQuery && (
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Song
-              </Button>
+              <Uploader type="custom" />
             )}
           </div>
         ) : (

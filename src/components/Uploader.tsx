@@ -3,9 +3,16 @@ import { UploadButton } from "./upload-button";
 import useAuthStore from "../store/useAuthStore";
 import { parseBlob } from "music-metadata-browser";
 import { apiService } from "@/services/apiService";
+import { useQueryClient } from "@tanstack/react-query";
+import { keys } from "@/constants/keys";
 
-export function Uploader() {
+export function Uploader({
+  type = "default",
+}: {
+  type?: "default" | "custom";
+}) {
   const { accessToken } = useAuthStore();
+  const queryClient = useQueryClient();
   const { control } = useUploadFile({
     route: "audio",
     api: `${import.meta.env.VITE_URL}/upload`,
@@ -29,7 +36,6 @@ export function Uploader() {
         const metadata = await parseBlob(file.raw);
 
         console.log("meta data", metadata);
-        
 
         const title =
           metadata.common.title || file.name.replace(/\.[^.]+$/, "");
@@ -40,13 +46,16 @@ export function Uploader() {
           metadata.common.artist || metadata.common.albumartist || null;
         const album = metadata.common.album || null;
 
-        const albumCover = metadata.common.picture?.[0] || null
-        let coverBase64 = null
+        const albumCover = metadata.common.picture?.[0] || null;
+        let coverBase64 = null;
         if (albumCover) {
           const base64 = btoa(
-            new Uint8Array(albumCover.data).reduce((data, byte) => data + String.fromCharCode(byte), ""
-          ))
-          coverBase64 = `data: ${albumCover.format};base64,${base64}`
+            new Uint8Array(albumCover.data).reduce(
+              (data, byte) => data + String.fromCharCode(byte),
+              ""
+            )
+          );
+          coverBase64 = `data: ${albumCover.format};base64,${base64}`;
         }
 
         // Create the song
@@ -60,10 +69,13 @@ export function Uploader() {
         });
 
         console.log("Song created successfully");
+
+        // Invalidate songs query to refresh the list
+        queryClient.invalidateQueries({ queryKey: [keys.songs] });
       } catch (error) {
         console.error("Failed to create song:", error);
       }
     },
   });
-  return <UploadButton control={control} accept="audio/mp3" />;
+  return <UploadButton type={type} control={control} accept="audio/mp3" />;
 }

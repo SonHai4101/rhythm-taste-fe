@@ -15,6 +15,9 @@ interface PlayerStore {
   isShuffling: boolean;
   audioElement: HTMLAudioElement | null;
 
+  volume: number;
+  muted: boolean;
+
   repeatMode: "off" | "all" | "one";
   toggleRepeat: () => void;
 
@@ -31,6 +34,9 @@ interface PlayerStore {
 
   saveStateToLocalStorage: () => void;
   loadStateFromLocalStorage: () => void;
+
+  setVolume: (value: number) => void;
+  toggleMute: () => void;
 }
 
 export const usePlayerStore = create<PlayerStore>((set, get) => ({
@@ -43,6 +49,8 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   isPlaying: false,
   isShuffling: false,
   audioElement: null,
+  volume: 80,
+  muted: false,
   repeatMode: "off",
   toggleRepeat: () =>
     set((state) => {
@@ -183,6 +191,35 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
     } catch (err) {
       console.error("Failed to load player state: ", err);
     }
+  },
+  setVolume: (value) => {
+    const audio = get().audioElement;
+    if (audio) audio.volume = value / 100;
+    set({
+      volume: value,
+      muted: value === 0,
+    });
+  },
+  toggleMute: () => {
+    const state = get();
+    const newMute = !state.muted;
+
+    if (state.audioElement) {
+      if (newMute) {
+        // Muting: set audio to 0
+        state.audioElement.volume = 0;
+      } else {
+        // Unmuting: restore to the stored volume (or default to 80 if it was 0)
+        const restoreVolume = state.volume > 0 ? state.volume : 80;
+        state.audioElement.volume = restoreVolume / 100;
+        // Update the volume state if it was 0
+        if (state.volume === 0) {
+          set({ muted: false, volume: restoreVolume });
+          return;
+        }
+      }
+    }
+    set({ muted: newMute });
   },
 }));
 

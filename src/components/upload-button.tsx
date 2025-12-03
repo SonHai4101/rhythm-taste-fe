@@ -1,7 +1,7 @@
-import { Button } from './ui/button';
-import type { UploadHookControl } from '@better-upload/client';
-import { Loader2, Upload } from 'lucide-react';
-import { useId } from 'react';
+import { Button } from "./ui/button";
+import type { UploadHookControl } from "@better-upload/client";
+import { Loader2, Plus, Upload } from "lucide-react";
+import { useId } from "react";
 
 type UploadButtonProps = {
   control: UploadHookControl<false>;
@@ -9,10 +9,11 @@ type UploadButtonProps = {
   accept?: string;
   metadata?: Record<string, unknown>;
   uploadOverride?: (
-    ...args: Parameters<UploadHookControl<false>['upload']>
+    ...args: Parameters<UploadHookControl<false>["upload"]>
   ) => void;
 
   // Add any additional props you need.
+  type?: "default" | "custom";
 };
 
 export function UploadButton({
@@ -21,6 +22,7 @@ export function UploadButton({
   accept,
   metadata,
   uploadOverride,
+  type = "default",
 }: UploadButtonProps) {
   const id = useId();
 
@@ -40,19 +42,23 @@ export function UploadButton({
                 upload(e.target.files[0], { metadata });
               }
             }
-            e.target.value = '';
+            e.target.value = "";
           }}
         />
       </label>
       {isPending ? (
         <>
           <Loader2 className="size-4 animate-spin" />
-          Upload file
+          {type === "default" ? "Upload file" : "Add Your First Song"}
         </>
       ) : (
         <>
-          <Upload className="size-4" />
-          Upload file
+          {type === "default" ? (
+            <Upload className="size-4" />
+          ) : (
+            <Plus className="size-4" />
+          )}
+          {type === "default" ? "Upload file" : "Add Your First Song"}
         </>
       )}
     </Button>
